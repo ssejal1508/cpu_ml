@@ -545,5 +545,24 @@ def get_or_create_default_user():
         db.session.commit()
     return default_user
 
+def load_workload(dataset="synthetic", num_processes=5000, google_csv="data/google/google_workload.csv"):
+    if dataset == "synthetic":
+        return generate_synthetic_processes(num_processes) # YOUR EXISTING CODE
+        
+    elif dataset == "google":
+        df = pd.read_csv(google_csv)
+        processes = []
+        for _, row in df.iterrows():
+            # NOTE: Adapt `Process` to whatever class/dict your codebase uses
+            processes.append(Process(
+                pid=int(row['pid']),
+                arrival_time=int(row['arrival_time']),
+                burst_time=int(row['burst_time']),
+                priority=int(row['priority'])
+            ))
+        return processes
+    else:
+        raise ValueError("Invalid dataset type")
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
